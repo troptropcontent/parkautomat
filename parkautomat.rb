@@ -39,9 +39,9 @@ def current_ticket_in_client
   ParkingTicket.current_ticket
 end
 
-def save_ticket(ticket)
-  puts "✅ A ticket that expires on #{ticket.ends_on} have been found in the client, saving it to the database."
-  Ticket.create(ticket)
+def save_ticket(ticket_attributes)
+  puts "✅ A ticket that expires on #{new_ticket["ends_on"]} have been found in the client, saving it to the database."
+  Ticket.create(new_ticket)
 end
 
 def renew_ticket
@@ -54,6 +54,6 @@ if ticket = current_ticket_in_database
   puts "✅ A ticket have been found in the database, it expires on #{ticket.ends_on}"
 else
   puts "❌ No ticket found in the database"
-  ticket = current_ticket_in_client ? save_ticket(ticket) : renew_ticket
+  (ticket_attributes = current_ticket_in_client) ? save_ticket(ticket_attributes) : renew_ticket
 end
 
