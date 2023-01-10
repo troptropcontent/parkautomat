@@ -1,1 +1,1 @@
-`bundle install` then `ruby parkaumat`
+`bundle install` then `ruby parkautomat.rb`
