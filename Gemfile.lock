@@ -19,8 +19,8 @@ GEM
     faraday-net_http (3.0.2)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
-    minitest (5.16.3)
-    parking_ticket (0.1.2)
+    minitest (5.17.0)
+    parking_ticket (1.0.0)
       faraday
     ruby2_keywords (0.0.5)
     sqlite3 (1.5.4-arm64-darwin)
