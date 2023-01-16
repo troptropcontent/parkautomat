@@ -1,6 +1,19 @@
 require 'parking_ticket'
 require 'active_record'
 require 'dotenv/load'
+require 'optparse'
+require 'logger'
+
+# handle command line options
+options = {}
+OptionParser.new do |opts|
+  opts.on('-e', '--execute', 'Execute the script') do |_v|
+    options[:execute] = true
+  end
+end.parse!
+
+#setup a logger
+@logger = Logger.new('log/parkautomat.log')
 
 # Database
 ActiveRecord::Base.establish_connection(
@@ -10,7 +23,7 @@ ActiveRecord::Base.establish_connection(
 
 # ParkingTicket
 
-parking_ticket = ParkingTicket::Base.new(
+@parking_ticket = ParkingTicket::Base.new(
   'pay_by_phone',
   {
     username: ENV['PARKING_TICKET_USERNAME'],
@@ -42,30 +55,32 @@ class Ticket < ActiveRecord::Base
 end
 
 def current_ticket_in_database
-  puts "🔎 Looking for a ticket in the database"
+  @logger.info("🔎 Looking for a ticket in the database")
   Ticket.find_by(ends_on: Time.now..)
 end
 
-def current_ticket_in_client(parking_ticket)
-  puts "🔎 Looking for a current ticket in the client"
-  parking_ticket.current_ticket
+def current_ticket_in_client
+  logger.info("🔎 Looking for a current ticket in the client")
+  @parking_ticket.current_ticket
 end
 
 def save_ticket(ticket_attributes)
-  puts "✅ A ticket that expires on #{ticket_attributes["ends_on"]} have been found in the client, saving it to the database."
+  @logger.info("✅ A ticket that expires on #{ticket_attributes[:ends_on]} have been found in the client, saving it to the database.")
   Ticket.create(ticket_attributes)
 end
 
-def renew_ticket(parking_ticket)
-  puts "❌ No ticket found in the client, renewing ticket."
-  parking_ticket.renew
+def renew_ticket
+  @logger.info("❌ No ticket found in the client, renewing ticket.")
+  @parking_ticket.renew
 end
 
-
-if ticket = current_ticket_in_database
-  puts "✅ A ticket have been found in the database, it expires on #{ticket.ends_on}"
-else
-  puts "❌ No ticket found in the database"
-  (ticket_attributes = current_ticket_in_client(parking_ticket)) ? save_ticket(ticket_attributes) : renew_ticket(parking_ticket)
+def execute
+  if ticket = current_ticket_in_database
+    @logger.info("✅ A ticket have been found in the database, it expires on #{ticket.ends_on}") 
+  else 
+    logger.info("❌ No ticket found in the database")
+    (ticket_attributes = current_ticket_in_client) ? save_ticket(ticket_attributes) : renew_ticket
+  end
 end
 
+execute if options[:execute]
