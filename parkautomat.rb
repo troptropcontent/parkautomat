@@ -60,7 +60,7 @@ def current_ticket_in_database
 end
 
 def current_ticket_in_client
-  logger.info("🔎 Looking for a current ticket in the client")
+  @logger.info("🔎 Looking for a current ticket in the client")
   @parking_ticket.current_ticket
 end
 
@@ -78,7 +78,7 @@ def execute
   if ticket = current_ticket_in_database
     @logger.info("✅ A ticket have been found in the database, it expires on #{ticket.ends_on}") 
   else 
-    logger.info("❌ No ticket found in the database")
+    @logger.info("❌ No ticket found in the database")
     (ticket_attributes = current_ticket_in_client) ? save_ticket(ticket_attributes) : renew_ticket
   end
 end
